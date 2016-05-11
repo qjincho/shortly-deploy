@@ -5,6 +5,10 @@
   "main": "server.js",
   "repository": "",
   "private": true,
+  "engines": {
+    "node": "0.12.7",
+    "npm": "2.11.3"
+  }
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
     "bluebird": "1.0.8",
