@@ -4,8 +4,10 @@ var expect = require('chai').expect;
 var app = require('../server-config.js');
 
 var db = require('../app/config');
-var User = require('../app/models/user');
-var Link = require('../app/models/link');
+var User = db.User;
+var Link = db.Link;
+
+// this.timeout(2000);
 
 /////////////////////////////////////////////////////
 // NOTE: these tests are designed for mongo!
@@ -20,9 +22,9 @@ describe('', function() {
       .end(function(err, res) {
 
         // Delete objects from db so they can be created later for the test
-        Link.remove({url: 'http://www.roflzoo.com/'}).exec();
-        User.remove({username: 'Savannah'}).exec();
-        User.remove({username: 'Phillip'}).exec();
+        Link.remove({ url: 'http://www.roflzoo.com/' }).exec();
+        User.remove({ username: 'Savannah' }).exec();
+        User.remove({ username: 'Phillip' }).exec();
 
         done();
       });
@@ -30,11 +32,27 @@ describe('', function() {
 
   describe('Link creation: ', function() {
 
+    beforeEach(function(done) {
+      // Log out currently signed in user
+      request(app)
+        .get('/logout')
+        .end(function(err, res) {
+
+          // Delete objects from db so they can be created later for the test
+          Link.remove({ url: 'http://www.roflzoo.com/' }).exec();
+          User.remove({ username: 'Savannah' }).exec();
+          User.remove({ username: 'Phillip' }).exec();
+
+          done();
+        });
+    });
+
     it('Only shortens valid urls, returning a 404 - Not found for invalid urls', function(done) {
       request(app)
         .post('/links')
         .send({
-          'url': 'definitely not a valid url'})
+          'url': 'definitely not a valid url'
+        })
         .expect(404)
         .end(done);
     });
@@ -45,7 +63,8 @@ describe('', function() {
         request(app)
           .post('/links')
           .send({
-            'url': 'http://www.roflzoo.com/'})
+            'url': 'http://www.roflzoo.com/'
+          })
           .expect(200)
           .expect(function(res) {
             expect(res.body.url).to.equal('http://www.roflzoo.com/');
@@ -58,10 +77,11 @@ describe('', function() {
         request(app)
           .post('/links')
           .send({
-            'url': 'http://www.roflzoo.com/'})
+            'url': 'http://www.roflzoo.com/'
+          })
           .expect(200)
           .expect(function(res) {
-            Link.findOne({'url': 'http://www.roflzoo.com/'})
+            Link.findOne({ 'url': 'http://www.roflzoo.com/' })
               .exec(function(err, link) {
                 if (err) { console.log(err); }
                 expect(link.url).to.equal('http://www.roflzoo.com/');
@@ -74,10 +94,11 @@ describe('', function() {
         request(app)
           .post('/links')
           .send({
-            'url': 'http://www.roflzoo.com/'})
+            'url': 'http://www.roflzoo.com/'
+          })
           .expect(200)
           .expect(function(res) {
-            Link.findOne({'url': 'http://www.roflzoo.com/'})
+            Link.findOne({ 'url': 'http://www.roflzoo.com/' })
               .exec(function(err, link) {
                 if (err) { console.log(err); }
                 expect(link.title).to.equal('Funny pictures of animals, funny dog pictures');
@@ -94,7 +115,7 @@ describe('', function() {
         link = new Link({
           url: 'http://www.roflzoo.com/',
           title: 'Funny pictures of animals, funny dog pictures',
-          baseUrl: 'http://127.0.0.1:4568',
+          baseUrl: 'http://127.0.0.1:8080',
           visits: 0
         });
 
@@ -108,7 +129,8 @@ describe('', function() {
         request(app)
           .post('/links')
           .send({
-            'url': 'http://www.roflzoo.com/'})
+            'url': 'http://www.roflzoo.com/'
+          })
           .expect(200)
           .expect(function(res) {
             var secondCode = res.body.code;
@@ -176,10 +198,11 @@ describe('', function() {
         .post('/signup')
         .send({
           'username': 'Svnh',
-          'password': 'Svnh' })
+          'password': 'Svnh'
+        })
         .expect(302)
         .expect(function() {
-          User.findOne({'username': 'Svnh'})
+          User.findOne({ 'username': 'Svnh' })
             .exec(function(err, user) {
               expect(user.username).to.equal('Svnh');
             });
@@ -192,7 +215,8 @@ describe('', function() {
         .post('/signup')
         .send({
           'username': 'Phillip',
-          'password': 'Phillip' })
+          'password': 'Phillip'
+        })
         .expect(302)
         .expect(function(res) {
           expect(res.headers.location).to.equal('/');
@@ -221,7 +245,8 @@ describe('', function() {
         .post('/login')
         .send({
           'username': 'Phillip',
-          'password': 'Phillip' })
+          'password': 'Phillip'
+        })
         .expect(302)
         .expect(function(res) {
           expect(res.headers.location).to.equal('/');
@@ -234,7 +259,8 @@ describe('', function() {
         .post('/login')
         .send({
           'username': 'Fred',
-          'password': 'Fred' })
+          'password': 'Fred'
+        })
         .expect(302)
         .expect(function(res) {
           expect(res.headers.location).to.equal('/login');

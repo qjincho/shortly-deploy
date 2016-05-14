@@ -48,12 +48,12 @@ module.exports = function(grunt) {
       }
     },
 
-    eslint: {
-      target: [
-        // Add list of files to lint here
-
-      ]
-    },
+    // eslint: {
+    //   target: [
+    //     // Add list of files to lint here
+    //
+    //   ]
+    // },
 
     cssmin: {},
 
@@ -122,16 +122,16 @@ module.exports = function(grunt) {
     'mochaTest'
   ]);
 
-  grunt.registerTask('build', ['concat', 'uglify']);
+  grunt.registerTask('build', ['concat', 'uglify', 'server-dev']);
 
-  grunt.registerTask('upload', function(n) {
-    if (grunt.option('prod')) {
-      // add your production server task here
-      grunt.task.run(['deploy']);
-    } else {
-      grunt.task.run(['server-dev']);
-    }
-  });
+  // grunt.registerTask('upload', function(n) {
+  //   if (grunt.option('prod')) {
+  //     // add your production server task here
+  //     grunt.task.run(['deploy']);
+  //   } else {
+  //     grunt.task.run(['server-dev']);
+  //   }
+  // });
 
   grunt.registerTask('deploy', [
     // add your deploy tasks here
@@ -139,6 +139,8 @@ module.exports = function(grunt) {
     'build',
     'shell'
   ]);
+
+
 
 
 };
